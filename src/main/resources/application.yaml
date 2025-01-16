@@ -1,0 +1,24 @@
+server:
+  port: {SERVER_PORT:8091}
+
+spring:
+  application:
+    name: geospatial-server
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/geospatial-server}
+    username: ${SPRING_DATASOURCE_USERNAME:geospatial-server-username}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+    jpa:
+      generate-ddl: false
+      show-sql: true
+      properties:
+        hibernate:
+          ddl-auto: validate
+    flyway:
+      url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/geospatial-server}
+      username: ${SPRING_DATASOURCE_USERNAME:geospatial-server-username}
+      password: ${SPRING_DATASOURCE_PASSWORD:password}
+      baseline-on-migration: true
+      enabled: true
+      locations: classpath:db/migration
