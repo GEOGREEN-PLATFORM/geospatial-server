@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "geospatial-server", description = "Работа с точками на карте")
+@Tag(name = "/geo/info", description = "Работа с точками на карте")
 @RequestMapping("/geo/info")
 public interface GeospatialController {
     @Operation(
