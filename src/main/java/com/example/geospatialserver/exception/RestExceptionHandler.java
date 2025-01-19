@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import static com.example.geospatialserver.util.ExceptionStringUtil.INTERNAL_SER
 import static com.example.geospatialserver.util.ExceptionStringUtil.NOT_FOUND_ERROR_TITLE;
 
 @Slf4j
-@RestControllerAdvice
+@RestController
 public class RestExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApplicationError> handleValidationExceptions(MethodArgumentNotValidException e) {

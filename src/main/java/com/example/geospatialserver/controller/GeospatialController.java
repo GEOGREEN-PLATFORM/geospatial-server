@@ -155,8 +155,8 @@ public interface GeospatialController {
                     )
             }
     )
-    @DeleteMapping
-    ResponseEntity<Void> deleteGeoPoint(@PathVariable UUID geoPontId);
+    @DeleteMapping(path = "/{geoPointId}")
+    ResponseEntity<Void> deleteGeoPoint(@PathVariable UUID geoPointId);
 
     @Operation(
             summary = "Получение информации обо всех точках с типом/без типа"
@@ -189,6 +189,6 @@ public interface GeospatialController {
                     )
             }
     )
-    @GetMapping(path = {"", "/{type}"})
+    @GetMapping(path = {"", "/{problemAreaType}"})
     ResponseEntity<List<MarkerDTO>> getAllGeoPoints(@PathVariable(required = false) String problemAreaType);
 }

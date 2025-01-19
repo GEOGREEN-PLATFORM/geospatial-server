@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -17,7 +18,7 @@ public class MarkerDTO {
 
     //@Size(min = 2, max = 2)?
     @NotNull
-    private Double[] coordinate;
+    private List<Double> coordinate;
 
     @NotNull
     @Valid
@@ -25,5 +26,5 @@ public class MarkerDTO {
 
     private UUID relatedTaskId;
 
-    private Double[][] coordinates;
+    private List<List<Double>> coordinates;
 }
