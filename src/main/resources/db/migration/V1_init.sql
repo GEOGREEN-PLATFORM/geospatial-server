@@ -1,3 +1,0 @@
-CREATE TABLE IF NOT EXISTS geospatial (
-    id uuid NOT NULL PRIMARY KEY
-)

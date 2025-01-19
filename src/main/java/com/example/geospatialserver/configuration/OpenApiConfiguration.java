@@ -1,4 +1,4 @@
-package com.example.geospatial_server.configuration;
+package com.example.geospatialserver.configuration;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;

@@ -1,8 +1,7 @@
-package com.example.geospatial_server.controller;
+package com.example.geospatialserver.controller;
 
-import com.example.geospatial_server.exception.ApplicationError;
-import com.example.geospatial_server.model.dto.MarkerDTO;
-import com.example.geospatial_server.model.dto.enums.ProblemAreaType;
+import com.example.geospatialserver.exception.ApplicationError;
+import com.example.geospatialserver.model.dto.MarkerDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,17 +12,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "geospatial-server", description = "Информация о проблемных точках")
-@RequestMapping("/geo")
+@Tag(name = "geospatial-server", description = "Работа с точками на карте")
+@RequestMapping("/geo/info")
 public interface GeospatialController {
     @Operation(
             summary = "Получение информации о точке по id"
@@ -56,8 +57,8 @@ public interface GeospatialController {
                     )
             }
     )
-    @GetMapping(path = "/info/{geoPointId}")
-    ResponseEntity<MarkerDTO> getGeoPointInfo(@PathVariable UUID geoPointId);
+    @GetMapping(path = "/{geoPointId}")
+    ResponseEntity<MarkerDTO> getGeoPoint(@PathVariable UUID geoPointId);
 
     @Operation(
             summary = "Сохранение информации о точке"
@@ -90,11 +91,75 @@ public interface GeospatialController {
                     )
             }
     )
-    @PostMapping(path = "/info")
-    ResponseEntity<MarkerDTO> saveGeoPointInfo(@Valid @RequestBody MarkerDTO markerDTO);
+    @PostMapping
+    ResponseEntity<MarkerDTO> createGeoPoint(@Valid @RequestBody MarkerDTO markerDTO);
 
     @Operation(
-            summary = "Получение информации обо всех точка указанного типа"
+            summary = "Обновление информации о точке"
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = MarkerDTO.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Некорректные данные",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApplicationError.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Внутренняя ошибка сервера",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApplicationError.class)
+                            )
+                    )
+            }
+    )
+    @PutMapping
+    ResponseEntity<MarkerDTO> updateGeoPoint(@Valid @RequestBody MarkerDTO markerDTO);
+
+    @Operation(
+            summary = "Удаление точки по id"
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Некорректные данные",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApplicationError.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Внутренняя ошибка сервера",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApplicationError.class)
+                            )
+                    )
+            }
+    )
+    @DeleteMapping
+    ResponseEntity<Void> deleteGeoPoint(@PathVariable UUID geoPontId);
+
+    @Operation(
+            summary = "Получение информации обо всех точках с типом/без типа"
     )
     @ApiResponses(
             value = {
@@ -124,6 +189,6 @@ public interface GeospatialController {
                     )
             }
     )
-    @GetMapping(path = "/info/{type}")
-    ResponseEntity<List<MarkerDTO>> getAllGeoPointsByProblemAreaType(@PathVariable ProblemAreaType problemAreaType);
+    @GetMapping(path = {"", "/{type}"})
+    ResponseEntity<List<MarkerDTO>> getAllGeoPoints(@PathVariable(required = false) String problemAreaType);
 }

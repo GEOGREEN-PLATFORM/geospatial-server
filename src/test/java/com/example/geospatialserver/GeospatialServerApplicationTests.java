@@ -1,4 +1,4 @@
-package com.example.geospatial_server;
+package com.example.geospatialserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
