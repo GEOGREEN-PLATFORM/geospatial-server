@@ -1,6 +1,5 @@
 package com.example.geospatialserver.model.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +29,6 @@ public class ProblemAreaTypeEntity {
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "problemAreaTypeId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "problemAreaTypeId")
     private List<EliminationMethodEntity> eliminationMethodEntities;
 }

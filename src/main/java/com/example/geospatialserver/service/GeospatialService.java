@@ -10,7 +10,7 @@ public interface GeospatialService {
 
     MarkerDTO getGeoPoint(UUID geoPontId);
 
-    MarkerDTO updateGeoPoint(MarkerDTO marker);
+    MarkerDTO updateGeoPoint(UUID geoPointId, MarkerDTO marker);
 
     void deleteGeoPoint(UUID geoPointId);
 

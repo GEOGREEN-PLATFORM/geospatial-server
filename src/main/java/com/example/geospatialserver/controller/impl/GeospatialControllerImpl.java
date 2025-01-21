@@ -27,8 +27,8 @@ public class GeospatialControllerImpl implements GeospatialController {
     }
 
     @Override
-    public ResponseEntity<MarkerDTO> updateGeoPoint(MarkerDTO markerDTO) {
-        return ResponseEntity.ok(geospatialService.updateGeoPoint(markerDTO));
+    public ResponseEntity<MarkerDTO> updateGeoPoint(UUID geoPontId, MarkerDTO markerDTO) {
+        return ResponseEntity.ok(geospatialService.updateGeoPoint(geoPontId, markerDTO));
     }
 
     @Override

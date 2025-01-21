@@ -14,9 +14,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -48,6 +48,14 @@ public interface GeospatialController {
                             )
                     ),
                     @ApiResponse(
+                            responseCode = "404",
+                            description = "Данные не найдены",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApplicationError.class)
+                            )
+                    ),
+                    @ApiResponse(
                             responseCode = "500",
                             description = "Внутренняя ошибка сервера",
                             content = @Content(
@@ -58,7 +66,7 @@ public interface GeospatialController {
             }
     )
     @GetMapping(path = "/{geoPointId}")
-    ResponseEntity<MarkerDTO> getGeoPoint(@PathVariable UUID geoPointId);
+    ResponseEntity<MarkerDTO> getGeoPoint(@PathVariable("geoPointId") UUID geoPointId);
 
     @Operation(
             summary = "Сохранение информации о точке"
@@ -82,6 +90,14 @@ public interface GeospatialController {
                             )
                     ),
                     @ApiResponse(
+                            responseCode = "404",
+                            description = "Данные не найдены",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApplicationError.class)
+                            )
+                    ),
+                    @ApiResponse(
                             responseCode = "500",
                             description = "Внутренняя ошибка сервера",
                             content = @Content(
@@ -95,7 +111,7 @@ public interface GeospatialController {
     ResponseEntity<MarkerDTO> createGeoPoint(@Valid @RequestBody MarkerDTO markerDTO);
 
     @Operation(
-            summary = "Обновление информации о точке"
+            summary = "Обновление информации о точке. Апдейтить можно всё кроме - uuid, square"
     )
     @ApiResponses(
             value = {
@@ -116,6 +132,14 @@ public interface GeospatialController {
                             )
                     ),
                     @ApiResponse(
+                            responseCode = "404",
+                            description = "Данные не найдены",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApplicationError.class)
+                            )
+                    ),
+                    @ApiResponse(
                             responseCode = "500",
                             description = "Внутренняя ошибка сервера",
                             content = @Content(
@@ -125,8 +149,8 @@ public interface GeospatialController {
                     )
             }
     )
-    @PutMapping
-    ResponseEntity<MarkerDTO> updateGeoPoint(@Valid @RequestBody MarkerDTO markerDTO);
+    @PatchMapping(path = "/{geoPointId}")
+    ResponseEntity<MarkerDTO> updateGeoPoint(@PathVariable("geoPointId") UUID geoPontId, @RequestBody MarkerDTO markerDTO);
 
     @Operation(
             summary = "Удаление точки по id"
@@ -146,6 +170,14 @@ public interface GeospatialController {
                             )
                     ),
                     @ApiResponse(
+                            responseCode = "404",
+                            description = "Данные не найдены",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApplicationError.class)
+                            )
+                    ),
+                    @ApiResponse(
                             responseCode = "500",
                             description = "Внутренняя ошибка сервера",
                             content = @Content(
@@ -156,7 +188,7 @@ public interface GeospatialController {
             }
     )
     @DeleteMapping(path = "/{geoPointId}")
-    ResponseEntity<Void> deleteGeoPoint(@PathVariable UUID geoPointId);
+    ResponseEntity<Void> deleteGeoPoint(@PathVariable("geoPointId") UUID geoPointId);
 
     @Operation(
             summary = "Получение информации обо всех точках с типом/без типа"
@@ -189,6 +221,6 @@ public interface GeospatialController {
                     )
             }
     )
-    @GetMapping(path = {"", "/{problemAreaType}"})
-    ResponseEntity<List<MarkerDTO>> getAllGeoPoints(@PathVariable(required = false) String problemAreaType);
+    @GetMapping(path = {"/getAll", "/getAll/{problemAreaType}"})
+    ResponseEntity<List<MarkerDTO>> getAllGeoPoints(@PathVariable(required = false, name = "problemAreaType") String problemAreaType);
 }

@@ -28,42 +28,42 @@ import java.util.UUID;
 public class GeoPointEntity {
     @Id
     @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "x_coordinate", nullable = false)
-    private Float xCoordinate;
+    private Double xCoordinate;
 
     @Column(name = "y_coordinate", nullable = false)
-    private Float yCoordinate;
+    private Double yCoordinate;
 
     @Column(name = "square")
-    private Float square;
+    private Double square;
 
     @Column(name = "owner", nullable = false)
     private String owner;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "land_type_id", referencedColumnName = "id", nullable = false)
-    private LandTypeEntity landTypeEntity;
+    private LandTypeEntity landType;
 
     @Column(name = "contracting_organization", nullable = false)
     private String contractingOrganization;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "work_stage_id", referencedColumnName = "id", nullable = false)
-    private WorkStageEntity workStageEntity;
+    private WorkStageEntity workStage;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "problem_area_type_id", referencedColumnName = "id", nullable = false)
-    private EliminationMethodEntity eliminationMethodEntity;
+    @JoinColumn(name = "elimination_method_id", referencedColumnName = "id", nullable = false)
+    private EliminationMethodEntity eliminationMethod;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "images")
     private List<UUID> images;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "elimination_method_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "problem_area_type_id", referencedColumnName = "id", nullable = false)
     private ProblemAreaTypeEntity problemAreaType;
 
     @Column(name = "comment", nullable = false)
@@ -74,5 +74,5 @@ public class GeoPointEntity {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "coordinates", nullable = false)
-    private List<List<Float>> coordinates;
+    private List<List<Double>> coordinates;
 }

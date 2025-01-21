@@ -2,6 +2,7 @@ package com.example.geospatialserver.model.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,10 +14,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MarkerDTO {
-    @NotNull
     private UUID id;
 
-    //@Size(min = 2, max = 2)?
+    @Size(min = 2, max = 2)
     @NotNull
     private List<Double> coordinate;
 
