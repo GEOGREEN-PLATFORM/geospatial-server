@@ -2,7 +2,7 @@ name: Geospatial Server Build
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: GEOGREEN-PLATFORM/geospatial-server
+  IMAGE_NAME: geogreen-platform/geospatial-server
 
 on:
   workflow_dispatch:
