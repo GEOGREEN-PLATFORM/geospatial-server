@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -17,25 +16,23 @@ public class DetailsDTO {
     @NotNull
     private String owner;
 
-    //todo проверить если такой тип в бд
     @NotNull
     private String landType;
 
     @NotNull
     private String contractingOrganization;
 
-    //todo проверить если такой тип в бд
     @NotNull
     private String workStage;
 
-    //todo проверить если такой тип в бд
     @NotNull
     private String eliminationMethod;
 
-    private List<UUID> images;
+    private List<ImageUrlDTO> images;
 
-    //todo проверить если такой тип в бд
     private String problemAreaType;
 
     private String comment;
+
+    private String density;
 }

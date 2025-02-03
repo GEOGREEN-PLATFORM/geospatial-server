@@ -1,5 +1,6 @@
 package com.example.geospatialserver.model.entity;
 
+import com.example.geospatialserver.model.dto.ImageUrlDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -60,7 +61,7 @@ public class GeoPointEntity {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "images")
-    private List<UUID> images;
+    private List<ImageUrlDTO> images;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "problem_area_type_id", referencedColumnName = "id", nullable = false)

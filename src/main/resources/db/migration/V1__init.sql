@@ -64,6 +64,8 @@ CREATE TABLE IF NOT EXISTS geospatial (
     comment varchar(255) NOT NULL,
     related_task_id uuid,
     coordinates JSONB,
+    density varchar(255),
+    creation_date DATE DEFAULT CURRENT_DATE,
     FOREIGN KEY (elimination_method_id) REFERENCES elimination_method  (id),
     FOREIGN KEY (problem_area_type_id) REFERENCES problem_area_type (id),
     FOREIGN KEY (land_type_id) REFERENCES land_type (id),

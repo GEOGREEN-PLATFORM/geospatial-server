@@ -34,7 +34,6 @@ public interface GeoPointMapper {
             entity.setYCoordinate(dto.getCoordinate().get(1));
         }
         if (dto.getRelatedTaskId() != null) entity.setRelatedTaskId(dto.getRelatedTaskId());
-        //todo обновить square
         if (dto.getCoordinates() != null) entity.setCoordinates(dto.getCoordinates());
         if (dto.getDetails() != null) {
             if (dto.getDetails().getOwner() != null) entity.setOwner(dto.getDetails().getOwner());

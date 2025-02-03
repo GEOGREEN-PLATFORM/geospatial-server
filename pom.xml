@@ -6,11 +6,11 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.3.1</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>geospatial-server</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${geospatial-server.version}</version>
 	<name>geospatial-server</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
@@ -27,6 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
+		<geospatial-server.version>0.1.0</geospatial-server.version>
 		<java.version>21</java.version>
 		<flywaydb.version>9.22.1</flywaydb.version>
 		<lombok.version>1.18.30</lombok.version>
@@ -73,10 +74,6 @@
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>${springdoc.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.mapstruct</groupId>

@@ -8,6 +8,7 @@ import com.example.geospatialserver.repository.LandTypeRepository;
 import com.example.geospatialserver.repository.ProblemAreaTypeRepository;
 import com.example.geospatialserver.repository.WorkStageRepository;
 import com.example.geospatialserver.service.DictService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,7 @@ public class DictServiceImpl implements DictService {
     @Override
     public List<String> getEliminationMethods(String problemAreaTypeName) {
         ProblemAreaTypeEntity problemAreaType = problemAreaTypeRepository.findByName(problemAreaTypeName)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new EntityNotFoundException("Неразрешённый тип проблемы"));
         return problemAreaType.getEliminationMethodEntities().stream().map(EliminationMethodEntity::getName).toList();
     }
 
