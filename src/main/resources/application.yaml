@@ -1,11 +1,11 @@
 server:
-  port: {SERVER_PORT:8091}
+  port: 8087
 
 spring:
   application:
     name: geospatial-server
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/geospatial-server}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5435/geospatial-server}
     username: ${SPRING_DATASOURCE_USERNAME:geospatial-server-username}
     password: ${SPRING_DATASOURCE_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
@@ -16,13 +16,19 @@ spring:
         hibernate:
           ddl-auto: validate
     flyway:
-      url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/geospatial-server}
+      url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5435/geospatial-server}
       username: ${SPRING_DATASOURCE_USERNAME:geospatial-server-username}
       password: ${SPRING_DATASOURCE_PASSWORD:password}
       baseline-on-migration: true
       enabled: true
       locations: classpath:db/migration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_URL:http://localhost:8081}/realms/geogreen
+          jwk-set-uri: ${KEYCLOAK_URL:http://localhost:8081}/realms/geogreen/protocol/openid-connect/certs
 
 logging:
   level:
-    root: DEBUG
+    root: INFO

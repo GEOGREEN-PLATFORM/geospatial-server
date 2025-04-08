@@ -3,13 +3,13 @@ services:
     image: postgres:16
     hostname: postgres
     ports:
-      - "5432:5432"
+      - "5435:5432"
     environment:
       POSTGRES_DB: geospatial-server
       POSTGRES_USER: geospatial-server-username
       POSTGRES_PASSWORD: password
     volumes:
-      - postgresql-geospatial-server:/var/lib/postgresql-geospatial-server/data
+      - postgresql-geospatial-server1:/var/lib/postgresql-geospatial-server/data
 
 volumes:
-  postgresql-geospatial-server: { }
+  postgresql-geospatial-server1: { }

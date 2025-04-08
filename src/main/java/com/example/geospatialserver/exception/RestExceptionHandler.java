@@ -2,15 +2,19 @@ package com.example.geospatialserver.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,5 +77,19 @@ public class RestExceptionHandler {
         logTheException(e);
         var ApplicationError = new ApplicationError(NOT_FOUND_ERROR_TITLE, e.getMessage());
         return new ResponseEntity<>(ApplicationError, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({AuthenticationException.class, InvalidBearerTokenException.class})
+    public ResponseEntity<ApplicationError> handleAuthenticationException(Exception e) {
+        logTheException(e);
+        var ApplicationError = new ApplicationError("Ошибка аутентификации", e.getMessage());
+        return new ResponseEntity<>(ApplicationError, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
+    public ResponseEntity<ApplicationError> handleAccessDeniedException(Exception e) {
+        logTheException(e);
+        var ApplicationError = new ApplicationError("Недостаточно прав", e.getMessage());
+        return new ResponseEntity<>(ApplicationError, HttpStatus.FORBIDDEN);
     }
 }
