@@ -2,14 +2,18 @@ package com.example.geospatialserver.controller.impl;
 
 import com.example.geospatialserver.controller.DictController;
 import com.example.geospatialserver.service.DictService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static com.example.geospatialserver.util.AuthorizationStringUtil.AUTHORIZATION;
+
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = AUTHORIZATION)
 public class DictControllerImpl implements DictController {
     private final DictService dictService;
 
