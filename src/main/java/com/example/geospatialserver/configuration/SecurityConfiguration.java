@@ -15,7 +15,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfiguration {
     private static final String[] ALLOWED_URLS = {"/v3/api-docs/**", "/swagger-ui/**"};
 
-    //вынести роли в интерфейсы
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
