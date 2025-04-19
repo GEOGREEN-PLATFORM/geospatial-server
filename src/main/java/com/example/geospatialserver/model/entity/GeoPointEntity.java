@@ -76,4 +76,7 @@ public class GeoPointEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "coordinates", nullable = false)
     private List<List<Double>> coordinates;
+
+    @Column(name = "density")
+    private String density;
 }

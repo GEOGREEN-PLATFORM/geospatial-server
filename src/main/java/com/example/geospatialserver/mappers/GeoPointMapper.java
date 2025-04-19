@@ -41,6 +41,7 @@ public interface GeoPointMapper {
                 entity.setContractingOrganization(dto.getDetails().getContractingOrganization());
             if (dto.getDetails().getImages() != null) entity.setImages(dto.getDetails().getImages());
             if (dto.getDetails().getComment() != null) entity.setComment(dto.getDetails().getComment());
+            if (dto.getDetails().getDensity() != null) entity.setDensity(dto.getDetails().getDensity());
         }
         return entity;
     }
