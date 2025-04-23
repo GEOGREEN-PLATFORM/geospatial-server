@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/geo/dict")
 public interface DictController {
     @Operation(
-            summary = "Получение типов проблемных зон"
+            summary = "Получение типов проблемных зон. wow!"
     )
     @ApiResponses(
             value = {
