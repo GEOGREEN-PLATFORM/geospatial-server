@@ -43,7 +43,9 @@ public class GeospatialServiceImpl implements GeospatialService {
         geoPointEntity.setWorkStage(workStage);
         geoPointEntity.setEliminationMethod(eliminationMethod);
         geoPointEntity.setProblemAreaType(problemAreaType);
-        geoPointEntity.setSquare(calculateSquare(marker.getCoordinates()));
+        if (marker.getCoordinates() != null) {
+            geoPointEntity.setSquare(calculateSquare(marker.getCoordinates()));
+        }
         return geoPointMapper.toDTO(geoPointRepository.save(geoPointEntity));
     }
 
