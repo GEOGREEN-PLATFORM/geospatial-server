@@ -29,10 +29,7 @@ public class CustomJwtAuthenticationConverter extends JwtAuthenticationConverter
             authorities.addAll(roles.stream()
                     .map(role -> "ROLE_" + role.toUpperCase())
 
-                            .map(role -> {
-                                System.out.println(role);
-                                return new SimpleGrantedAuthority(role);
-                            })
+                            .map(role -> new SimpleGrantedAuthority(role))
                     .collect(Collectors.toList()));
         }
 
