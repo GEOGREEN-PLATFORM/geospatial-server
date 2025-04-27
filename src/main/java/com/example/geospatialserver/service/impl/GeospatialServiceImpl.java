@@ -103,7 +103,7 @@ public class GeospatialServiceImpl implements GeospatialService {
         if (marker.getCoordinates() != null) {
             geoPointEntity.setSquare(calculateSquare(marker.getCoordinates()));
         }
-        return geoPointMapper.toDTO(geoPointRepository.save(geoPointEntity));
+        return geoPointMapper.toDTO(geoPointRepository.saveAndFlush(geoPointEntity));
     }
 
     @Transactional

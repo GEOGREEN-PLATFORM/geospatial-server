@@ -28,6 +28,8 @@ public interface GeoPointMapper {
     @Mapping(target = "details.eliminationMethod", expression = "java(geoPointEntity.getEliminationMethod().getName())")
     @Mapping(target = "details.problemAreaType", expression = "java(geoPointEntity.getProblemAreaType().getName())")
     @Mapping(target = "details.density", source = "density")
+    @Mapping(target = "details.creationDate", source = "creationDate")
+    @Mapping(target = "details.updateDate", source = "updateDate")
     MarkerDTO toDTO(GeoPointEntity geoPointEntity);
 
     default GeoPointEntity mergeGeoPoint(GeoPointEntity entity, MarkerDTO dto) {
