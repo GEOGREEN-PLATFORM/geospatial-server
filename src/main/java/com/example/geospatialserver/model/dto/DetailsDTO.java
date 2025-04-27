@@ -34,5 +34,5 @@ public class DetailsDTO {
 
     private String comment;
 
-    private String density;
+    private Density density;
 }

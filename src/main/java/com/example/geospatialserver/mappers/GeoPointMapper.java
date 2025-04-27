@@ -11,9 +11,10 @@ public interface GeoPointMapper {
     @Mapping(target = "yCoordinate", expression = "java(markerDTO.getCoordinate().get(1))")
     @Mapping(target = "square", source = "details.square")
     @Mapping(target = "owner", source = "details.owner")
-    @Mapping(target = "contractingOrganization", source = "markerDTO.details.contractingOrganization")
-    @Mapping(target = "images", source = "markerDTO.details.images")
-    @Mapping(target = "comment", source = "markerDTO.details.comment")
+    @Mapping(target = "contractingOrganization", source = "details.contractingOrganization")
+    @Mapping(target = "images", source = "details.images")
+    @Mapping(target = "comment", source = "details.comment")
+    @Mapping(target = "density", source = "details.density")
     GeoPointEntity toEntity(MarkerDTO markerDTO);
 
     @Mapping(target = "coordinate", expression = "java(List.of(geoPointEntity.getXCoordinate(), geoPointEntity.getYCoordinate()))")
@@ -26,6 +27,7 @@ public interface GeoPointMapper {
     @Mapping(target = "details.workStage", expression = "java(geoPointEntity.getWorkStage().getName())")
     @Mapping(target = "details.eliminationMethod", expression = "java(geoPointEntity.getEliminationMethod().getName())")
     @Mapping(target = "details.problemAreaType", expression = "java(geoPointEntity.getProblemAreaType().getName())")
+    @Mapping(target = "details.density", source = "density")
     MarkerDTO toDTO(GeoPointEntity geoPointEntity);
 
     default GeoPointEntity mergeGeoPoint(GeoPointEntity entity, MarkerDTO dto) {
