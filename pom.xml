@@ -27,7 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<geospatial-server.version>0.1.11</geospatial-server.version>
+		<geospatial-server.version>0.1.12</geospatial-server.version>
 		<java.version>21</java.version>
 		<flywaydb.version>9.22.1</flywaydb.version>
 		<lombok.version>1.18.30</lombok.version>

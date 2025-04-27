@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import static com.example.geospatialserver.util.DateUtil.ISO_8601_DATE_TIME_MILLIS_PATTERN;
+import static com.example.geospatialserver.util.DateUtil.UTC;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -40,15 +43,15 @@ public class DetailsDTO {
 
     @JsonFormat(
             shape = JsonFormat.Shape.STRING,
-            pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX",
-            timezone = "UTC"
+            pattern = ISO_8601_DATE_TIME_MILLIS_PATTERN,
+            timezone = UTC
     )
     private OffsetDateTime creationDate;
 
     @JsonFormat(
             shape = JsonFormat.Shape.STRING,
-            pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX",
-            timezone = "UTC"
+            pattern = ISO_8601_DATE_TIME_MILLIS_PATTERN,
+            timezone = UTC
     )
     private OffsetDateTime updateDate;
 }
