@@ -73,7 +73,7 @@ public class GeospatialServiceImpl implements GeospatialService {
     @Override
     public MarkerDTO updateGeoPoint(UUID geoPointId, MarkerDTO marker) {
         var geoPointEntity = geoPointRepository.findById(geoPointId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Точка с id {%s} не найдена", marker.getId())));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Точка с id {%s} не найдена", geoPointId)));
 
         geoPointEntity = geoPointMapper.mergeGeoPoint(geoPointEntity, marker);
         var details = marker.getDetails();
