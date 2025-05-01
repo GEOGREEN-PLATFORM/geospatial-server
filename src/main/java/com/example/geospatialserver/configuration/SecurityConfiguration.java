@@ -19,6 +19,7 @@ public class SecurityConfiguration {
             "/geo/info/{geoPointId}",
             "/geo/info/getAll",
             "/geo/info/getAll/{problemAreaType}"};
+    //todo что-то с открытми путями сделать а то пересекаются
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

@@ -21,7 +21,6 @@ public class DetailsDTO {
     @NotNull
     private String owner;
 
-    @NotNull
     private String landType;
 
     @NotNull
@@ -30,7 +29,6 @@ public class DetailsDTO {
     @NotNull
     private String workStage;
 
-    @NotNull
     private String eliminationMethod;
 
     private List<ImageUrlDTO> images;
