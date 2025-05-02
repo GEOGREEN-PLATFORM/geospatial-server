@@ -1,7 +1,9 @@
 package com.example.geospatialserver.service;
 
+import com.example.geospatialserver.model.dto.ListMarkerResponse;
 import com.example.geospatialserver.model.dto.MarkerDTO;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,4 +17,8 @@ public interface GeospatialService {
     void deleteGeoPoint(UUID geoPointId);
 
     List<MarkerDTO> getAllGeoPoints(String problemAreaType);
+
+    ListMarkerResponse getAllGeoPoints(int page, int size,
+                                       String workStage, String landType,
+                                       OffsetDateTime startDate, OffsetDateTime endDate);
 }
