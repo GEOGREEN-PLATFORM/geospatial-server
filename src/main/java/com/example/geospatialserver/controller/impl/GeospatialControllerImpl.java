@@ -1,16 +1,21 @@
 package com.example.geospatialserver.controller.impl;
 
 import com.example.geospatialserver.controller.GeospatialController;
+import com.example.geospatialserver.model.dto.ListMarkerResponse;
 import com.example.geospatialserver.model.dto.MarkerDTO;
 import com.example.geospatialserver.service.GeospatialService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,5 +57,15 @@ public class GeospatialControllerImpl implements GeospatialController {
     @Override
     public ResponseEntity<List<MarkerDTO>> getAllGeoPoints(String problemAreaType) {
         return ResponseEntity.ok(geospatialService.getAllGeoPoints(problemAreaType));
+    }
+
+    @Override
+    public ResponseEntity<ListMarkerResponse> getAllGeoPoints(@NotNull @RequestParam("page") int page,
+                                                              @NotNull @RequestParam("size") int size,
+                                                              @RequestParam(value = "workStage", required = false) String workStage,
+                                                              @RequestParam(value = "landType", required = false) String landType,
+                                                              @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime fromDate,
+                                                              @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime toDate) {
+        return ResponseEntity.ok(geospatialService.getAllGeoPoints(page, size, workStage, landType, fromDate, toDate));
     }
 }

@@ -1,7 +1,9 @@
 package com.example.geospatialserver.service.impl;
 
 import com.example.geospatialserver.mappers.GeoPointMapper;
+import com.example.geospatialserver.model.dto.ListMarkerResponse;
 import com.example.geospatialserver.model.dto.MarkerDTO;
+import com.example.geospatialserver.model.entity.GeoPointEntity;
 import com.example.geospatialserver.repository.EliminationMethodRepository;
 import com.example.geospatialserver.repository.GeoPointRepository;
 import com.example.geospatialserver.repository.LandTypeRepository;
@@ -11,8 +13,13 @@ import com.example.geospatialserver.service.GeospatialService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -126,5 +133,51 @@ public class GeospatialServiceImpl implements GeospatialService {
                 .orElseThrow(() -> new EntityNotFoundException("Неразрешённый тип проблемы"));
         return geoPointRepository.findByProblemAreaTypeId(problemAreaTypeEntity.getId())
                 .stream().map(geoPointMapper::toDTO).toList();
+    }
+
+    @Override
+    public ListMarkerResponse getAllGeoPoints(int page, int size,
+                                              String workStage, String landType,
+                                              OffsetDateTime startDate, OffsetDateTime endDate) {
+        Pageable pageable = PageRequest.of(page, size);
+        Specification<GeoPointEntity> spec = Specification.where(null);
+
+        if (workStage != null) {
+            var workStageEntity = workStageRepository.findByName(workStage)
+                    .orElseThrow(() -> new EntityNotFoundException("Неразрешённый статус задачи"));
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(
+                            root.join("workStage").get("id"),
+                            workStageEntity.getId()
+                    )
+            );
+        }
+
+        if (landType != null) {
+            var landTypeEntity = landTypeRepository.findByName(landType)
+                    .orElseThrow(() -> new EntityNotFoundException("Неразрешённый тип земли"));
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(
+                            root.join("landType").get("id"),
+                            landTypeEntity.getId()
+                    )
+            );
+        }
+
+        if (startDate != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("creationDate"), startDate));
+        }
+
+        if (endDate != null) {
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("creationDate"), endDate));
+        }
+
+        Page<GeoPointEntity> geoPointsPage = geoPointRepository.findAll(spec, pageable);
+        ListMarkerResponse response = new ListMarkerResponse();
+        response.setGeoPoints(geoPointsPage.getContent().stream().map(geoPointMapper::toDTO).toList());
+        response.setCurrentPage(geoPointsPage.getNumber());
+        response.setTotalItems(geoPointsPage.getTotalElements());
+        response.setTotalPages(geoPointsPage.getTotalPages());
+        return response;
     }
 }
