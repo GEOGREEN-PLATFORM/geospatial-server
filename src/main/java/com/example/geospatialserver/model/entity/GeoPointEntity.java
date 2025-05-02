@@ -51,7 +51,7 @@ public class GeoPointEntity {
     private String owner;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "land_type_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "land_type_id", referencedColumnName = "id")
     private LandTypeEntity landType;
 
     @Column(name = "contracting_organization", nullable = false)
@@ -62,7 +62,7 @@ public class GeoPointEntity {
     private WorkStageEntity workStage;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "elimination_method_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "elimination_method_id", referencedColumnName = "id")
     private EliminationMethodEntity eliminationMethod;
 
     @JdbcTypeCode(SqlTypes.JSON)

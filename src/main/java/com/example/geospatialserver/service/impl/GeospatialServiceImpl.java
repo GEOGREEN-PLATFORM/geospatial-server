@@ -29,15 +29,17 @@ public class GeospatialServiceImpl implements GeospatialService {
     @Transactional
     @Override
     public MarkerDTO createGeoPoint(MarkerDTO marker) {
-        var landType = landTypeRepository.findByName(marker.getDetails().getLandType())
-                .orElseThrow(() -> new EntityNotFoundException("Неразрешённый тип земли"));
+        var landType = marker.getDetails().getLandType() == null ? null :
+                landTypeRepository.findByName(marker.getDetails().getLandType())
+                        .orElseThrow(() -> new EntityNotFoundException("Неразрешённый тип земли"));
         var workStage = workStageRepository.findByName(marker.getDetails().getWorkStage())
                 .orElseThrow(() -> new EntityNotFoundException("Неразрешённый статус задачи"));
         var problemAreaType = problemAreaTypeRepository.findByName(marker.getDetails().getProblemAreaType())
                 .orElseThrow(() -> new EntityNotFoundException("Неразрешённый тип проблемы"));
-        var eliminationMethod = eliminationMethodRepository
-                .findByProblemAreaTypeIdAndName(problemAreaType.getId(), marker.getDetails().getEliminationMethod())
-                .orElseThrow(() -> new EntityNotFoundException("Неразрешённый способ обработки"));
+        var eliminationMethod = marker.getDetails().getEliminationMethod() == null ? null :
+                eliminationMethodRepository
+                        .findByProblemAreaTypeIdAndName(problemAreaType.getId(), marker.getDetails().getEliminationMethod())
+                        .orElseThrow(() -> new EntityNotFoundException("Неразрешённый способ обработки"));
         var geoPointEntity = geoPointMapper.toEntity(marker);
         geoPointEntity.setLandType(landType);
         geoPointEntity.setWorkStage(workStage);
