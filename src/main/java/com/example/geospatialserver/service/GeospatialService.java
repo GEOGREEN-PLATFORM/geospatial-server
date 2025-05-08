@@ -1,5 +1,6 @@
 package com.example.geospatialserver.service;
 
+import com.example.geospatialserver.model.dto.Density;
 import com.example.geospatialserver.model.dto.ListMarkerResponse;
 import com.example.geospatialserver.model.dto.MarkerDTO;
 
@@ -20,5 +21,6 @@ public interface GeospatialService {
 
     ListMarkerResponse getAllGeoPoints(int page, int size,
                                        String workStage, String landType,
+                                       Density density, String eliminationMethod,
                                        OffsetDateTime startDate, OffsetDateTime endDate);
 }

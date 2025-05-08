@@ -1,6 +1,7 @@
 package com.example.geospatialserver.service.impl;
 
 import com.example.geospatialserver.mappers.GeoPointMapper;
+import com.example.geospatialserver.model.dto.Density;
 import com.example.geospatialserver.model.dto.ListMarkerResponse;
 import com.example.geospatialserver.model.dto.MarkerDTO;
 import com.example.geospatialserver.model.entity.GeoPointEntity;
@@ -138,6 +139,7 @@ public class GeospatialServiceImpl implements GeospatialService {
     @Override
     public ListMarkerResponse getAllGeoPoints(int page, int size,
                                               String workStage, String landType,
+                                              Density density, String eliminationMethod,
                                               OffsetDateTime startDate, OffsetDateTime endDate) {
         Pageable pageable = PageRequest.of(page, size);
         Specification<GeoPointEntity> spec = Specification.where(null);
@@ -149,6 +151,21 @@ public class GeospatialServiceImpl implements GeospatialService {
                     cb.equal(
                             root.join("workStage").get("id"),
                             workStageEntity.getId()
+                    )
+            );
+        }
+
+        if (density != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("density"), density));
+        }
+
+        if (eliminationMethod != null) {
+            var eliminationMethodEntity = eliminationMethodRepository.findByName(eliminationMethod)
+                    .orElseThrow(() -> new EntityNotFoundException("Неразрешённый способ обработки"));
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(
+                            root.join("eliminationMethod").get("id"),
+                            eliminationMethodEntity.getId()
                     )
             );
         }

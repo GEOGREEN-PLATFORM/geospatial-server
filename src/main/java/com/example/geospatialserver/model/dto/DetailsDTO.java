@@ -2,6 +2,7 @@ package com.example.geospatialserver.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,7 @@ public class DetailsDTO {
 
     private String eliminationMethod;
 
+    @Size(max = 10, message = "Количество изображений не может быть больше 10")
     private List<ImageUrlDTO> images;
 
     private String problemAreaType;
