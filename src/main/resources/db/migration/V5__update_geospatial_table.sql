@@ -1,5 +1,5 @@
 ALTER TABLE geospatial
-    ADD COLUMN related_task_ids jsonb NOT NULL DEFAULT '[]'::jsonb;
+    ADD COLUMN related_task_ids jsonb;
 
 UPDATE geospatial
 SET related_task_ids = CASE
@@ -8,3 +8,5 @@ SET related_task_ids = CASE
 END;
 
 ALTER TABLE geospatial DROP COLUMN related_task_id;
+
+ALTER TABLE geospatial ALTER COLUMN related_task_ids SET NOT NULL;

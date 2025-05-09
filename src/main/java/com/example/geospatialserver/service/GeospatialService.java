@@ -3,6 +3,7 @@ package com.example.geospatialserver.service;
 import com.example.geospatialserver.model.dto.Density;
 import com.example.geospatialserver.model.dto.ListMarkerResponse;
 import com.example.geospatialserver.model.dto.MarkerDTO;
+import com.example.geospatialserver.model.dto.OperatorStatisticDTO;
 import com.example.geospatialserver.model.dto.RelatedTaskDTO;
 
 import java.time.OffsetDateTime;
@@ -22,8 +23,10 @@ public interface GeospatialService {
 
     ListMarkerResponse getAllGeoPoints(int page, int size,
                                        String workStage, String landType,
-                                       Density density, String eliminationMethod,
+                                       Density density, String eliminationMethod, UUID operatorId,
                                        OffsetDateTime startDate, OffsetDateTime endDate);
 
     void addRelatedTask(UUID geoPointId, RelatedTaskDTO request);
+
+    OperatorStatisticDTO getStatistic(UUID operatorId);
 }

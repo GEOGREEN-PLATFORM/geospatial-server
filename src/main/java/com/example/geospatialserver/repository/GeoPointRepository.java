@@ -13,4 +13,6 @@ public interface GeoPointRepository extends JpaRepository<GeoPointEntity, UUID> 
     List<GeoPointEntity> findByProblemAreaTypeId(Integer problemAreaTypeId);
 
     Page<GeoPointEntity> findAll(Specification<GeoPointEntity> spec, Pageable pageable);
+
+    List<GeoPointEntity> findByOperatorId(UUID operatorId);
 }

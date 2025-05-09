@@ -32,7 +32,7 @@
 		<flywaydb.version>9.22.1</flywaydb.version>
 		<lombok.version>1.18.30</lombok.version>
 		<springdoc.version>2.3.0</springdoc.version>
-		<mapstruct.version>1.5.2.Final</mapstruct.version>
+		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
 	</properties>
 

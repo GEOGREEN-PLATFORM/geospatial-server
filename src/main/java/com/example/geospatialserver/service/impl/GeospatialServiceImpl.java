@@ -4,8 +4,10 @@ import com.example.geospatialserver.mappers.GeoPointMapper;
 import com.example.geospatialserver.model.dto.Density;
 import com.example.geospatialserver.model.dto.ListMarkerResponse;
 import com.example.geospatialserver.model.dto.MarkerDTO;
+import com.example.geospatialserver.model.dto.OperatorStatisticDTO;
 import com.example.geospatialserver.model.dto.RelatedTaskDTO;
 import com.example.geospatialserver.model.entity.GeoPointEntity;
+import com.example.geospatialserver.model.entity.WorkStage;
 import com.example.geospatialserver.repository.EliminationMethodRepository;
 import com.example.geospatialserver.repository.GeoPointRepository;
 import com.example.geospatialserver.repository.LandTypeRepository;
@@ -23,7 +25,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.example.geospatialserver.util.ExceptionStringUtil.GEO_POINT_NOT_FOUND;
 
@@ -143,7 +147,7 @@ public class GeospatialServiceImpl implements GeospatialService {
     @Override
     public ListMarkerResponse getAllGeoPoints(int page, int size,
                                               String workStage, String landType,
-                                              Density density, String eliminationMethod,
+                                              Density density, String eliminationMethod, UUID operatorId,
                                               OffsetDateTime startDate, OffsetDateTime endDate) {
         Pageable pageable = PageRequest.of(page, size);
         Specification<GeoPointEntity> spec = Specification.where(null);
@@ -185,6 +189,10 @@ public class GeospatialServiceImpl implements GeospatialService {
             );
         }
 
+        if (operatorId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("operatorId"), operatorId));
+        }
+
         if (startDate != null) {
             spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("creationDate"), startDate));
         }
@@ -207,5 +215,16 @@ public class GeospatialServiceImpl implements GeospatialService {
         var geoPointEntity = getGeoPointById(geoPointId);
         geoPointEntity.getRelatedTaskIds().add(request.getRelatedTaskId());
         geoPointRepository.save(geoPointEntity);
+    }
+
+    @Override
+    public OperatorStatisticDTO getStatistic(UUID operatorId) {
+        Map<String, Long> points = geoPointRepository.findByOperatorId(operatorId).stream()
+                .collect(Collectors.groupingBy(geoPoint -> geoPoint.getWorkStage().getName(), Collectors.counting()));
+        return OperatorStatisticDTO.builder()
+                .createdGeoPoints(points.get(WorkStage.CREATED.getStatus()))
+                .processedGeoPoints(points.get(WorkStage.PROCESSED.getStatus()))
+                .closedGeoPoints(points.get(WorkStage.CLOSED.getStatus()))
+                .build();
     }
 }

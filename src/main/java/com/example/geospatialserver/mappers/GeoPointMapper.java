@@ -15,6 +15,7 @@ public interface GeoPointMapper {
     @Mapping(target = "images", source = "details.images")
     @Mapping(target = "comment", source = "details.comment")
     @Mapping(target = "density", source = "details.density")
+    @Mapping(target = "operatorId", source = "details.operatorId")
     GeoPointEntity toEntity(MarkerDTO markerDTO);
 
     @Mapping(target = "coordinate", expression = "java(List.of(geoPointEntity.getXCoordinate(), geoPointEntity.getYCoordinate()))")
@@ -30,6 +31,7 @@ public interface GeoPointMapper {
     @Mapping(target = "details.density", source = "density")
     @Mapping(target = "details.creationDate", source = "creationDate")
     @Mapping(target = "details.updateDate", source = "updateDate")
+    @Mapping(target = "details.operatorId", source = "operatorId")
     MarkerDTO toDTO(GeoPointEntity geoPointEntity);
 
     default GeoPointEntity mergeGeoPoint(GeoPointEntity entity, MarkerDTO dto) {
@@ -46,6 +48,7 @@ public interface GeoPointMapper {
             if (dto.getDetails().getImages() != null) entity.setImages(dto.getDetails().getImages());
             if (dto.getDetails().getComment() != null) entity.setComment(dto.getDetails().getComment());
             if (dto.getDetails().getDensity() != null) entity.setDensity(dto.getDetails().getDensity());
+            if (dto.getDetails().getOperatorId() != null) entity.setOperatorId(dto.getDetails().getOperatorId());
         }
         return entity;
     }

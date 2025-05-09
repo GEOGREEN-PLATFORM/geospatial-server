@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static com.example.geospatialserver.util.DateUtil.ISO_8601_DATE_TIME_MILLIS_PATTERN;
 import static com.example.geospatialserver.util.DateUtil.UTC;
@@ -54,4 +55,6 @@ public class DetailsDTO {
             timezone = UTC
     )
     private OffsetDateTime updateDate;
+
+    private UUID operatorId;
 }

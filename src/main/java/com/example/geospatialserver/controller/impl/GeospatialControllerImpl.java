@@ -4,6 +4,7 @@ import com.example.geospatialserver.controller.GeospatialController;
 import com.example.geospatialserver.model.dto.Density;
 import com.example.geospatialserver.model.dto.ListMarkerResponse;
 import com.example.geospatialserver.model.dto.MarkerDTO;
+import com.example.geospatialserver.model.dto.OperatorStatisticDTO;
 import com.example.geospatialserver.model.dto.RelatedTaskDTO;
 import com.example.geospatialserver.service.GeospatialService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -68,9 +69,10 @@ public class GeospatialControllerImpl implements GeospatialController {
                                                               @RequestParam(value = "landType", required = false) String landType,
                                                               @RequestParam(value = "density", required = false) Density density,
                                                               @RequestParam(value = "eliminationMethod", required = false) String eliminationMethod,
+                                                              @RequestParam(value = "operatorId", required = false) UUID operatorId,
                                                               @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime fromDate,
                                                               @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime toDate) {
-        return ResponseEntity.ok(geospatialService.getAllGeoPoints(page, size, workStage, landType, density, eliminationMethod, fromDate, toDate));
+        return ResponseEntity.ok(geospatialService.getAllGeoPoints(page, size, workStage, landType, density, eliminationMethod, operatorId, fromDate, toDate));
     }
 
 
@@ -79,5 +81,11 @@ public class GeospatialControllerImpl implements GeospatialController {
     public ResponseEntity<Void> addRelatedTask(UUID geoPointId, RelatedTaskDTO request) {
         geospatialService.addRelatedTask(geoPointId, request);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RolesAllowed({ADMIN, OPERATOR})
+    @Override
+    public ResponseEntity<OperatorStatisticDTO> getStatistic(UUID operatorId) {
+        return ResponseEntity.ok(geospatialService.getStatistic(operatorId));
     }
 }
