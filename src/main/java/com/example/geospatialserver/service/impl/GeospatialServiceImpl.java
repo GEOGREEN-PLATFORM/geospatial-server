@@ -4,6 +4,7 @@ import com.example.geospatialserver.mappers.GeoPointMapper;
 import com.example.geospatialserver.model.dto.Density;
 import com.example.geospatialserver.model.dto.ListMarkerResponse;
 import com.example.geospatialserver.model.dto.MarkerDTO;
+import com.example.geospatialserver.model.dto.RelatedTaskDTO;
 import com.example.geospatialserver.model.entity.GeoPointEntity;
 import com.example.geospatialserver.repository.EliminationMethodRepository;
 import com.example.geospatialserver.repository.GeoPointRepository;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import static com.example.geospatialserver.util.ExceptionStringUtil.GEO_POINT_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -74,16 +77,19 @@ public class GeospatialServiceImpl implements GeospatialService {
 
     @Override
     public MarkerDTO getGeoPoint(UUID geoPointId) {
-        var geoPointEntity = geoPointRepository.findById(geoPointId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Точка с id {%s} не найдена", geoPointId)));
+        var geoPointEntity = getGeoPointById(geoPointId);
         return geoPointMapper.toDTO(geoPointEntity);
+    }
+
+    private GeoPointEntity getGeoPointById(UUID geoPointId) {
+        return geoPointRepository.findById(geoPointId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(GEO_POINT_NOT_FOUND, geoPointId)));
     }
 
     @Transactional
     @Override
     public MarkerDTO updateGeoPoint(UUID geoPointId, MarkerDTO marker) {
-        var geoPointEntity = geoPointRepository.findById(geoPointId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Точка с id {%s} не найдена", geoPointId)));
+        var geoPointEntity = getGeoPointById(geoPointId);
 
         geoPointEntity = geoPointMapper.mergeGeoPoint(geoPointEntity, marker);
         var details = marker.getDetails();
@@ -119,9 +125,7 @@ public class GeospatialServiceImpl implements GeospatialService {
     @Transactional
     @Override
     public void deleteGeoPoint(UUID geoPointId) {
-        if (!geoPointRepository.existsById(geoPointId)) {
-            throw new EntityNotFoundException(String.format("Точка с id {%s} не найдена", geoPointId));
-        }
+        getGeoPointById(geoPointId);
         geoPointRepository.deleteById(geoPointId);
     }
 
@@ -196,5 +200,12 @@ public class GeospatialServiceImpl implements GeospatialService {
         response.setTotalItems(geoPointsPage.getTotalElements());
         response.setTotalPages(geoPointsPage.getTotalPages());
         return response;
+    }
+
+    @Override
+    public void addRelatedTask(UUID geoPointId, RelatedTaskDTO request) {
+        var geoPointEntity = getGeoPointById(geoPointId);
+        geoPointEntity.getRelatedTaskIds().add(request.getRelatedTaskId());
+        geoPointRepository.save(geoPointEntity);
     }
 }

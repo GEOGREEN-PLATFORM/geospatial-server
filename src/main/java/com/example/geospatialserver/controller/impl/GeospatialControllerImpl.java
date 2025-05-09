@@ -4,6 +4,7 @@ import com.example.geospatialserver.controller.GeospatialController;
 import com.example.geospatialserver.model.dto.Density;
 import com.example.geospatialserver.model.dto.ListMarkerResponse;
 import com.example.geospatialserver.model.dto.MarkerDTO;
+import com.example.geospatialserver.model.dto.RelatedTaskDTO;
 import com.example.geospatialserver.service.GeospatialService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.security.RolesAllowed;
@@ -70,5 +71,13 @@ public class GeospatialControllerImpl implements GeospatialController {
                                                               @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime fromDate,
                                                               @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime toDate) {
         return ResponseEntity.ok(geospatialService.getAllGeoPoints(page, size, workStage, landType, density, eliminationMethod, fromDate, toDate));
+    }
+
+
+    @RolesAllowed({ADMIN, OPERATOR})
+    @Override
+    public ResponseEntity<Void> addRelatedTask(UUID geoPointId, RelatedTaskDTO request) {
+        geospatialService.addRelatedTask(geoPointId, request);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

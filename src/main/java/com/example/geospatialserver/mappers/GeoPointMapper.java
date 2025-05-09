@@ -37,7 +37,7 @@ public interface GeoPointMapper {
             entity.setXCoordinate(dto.getCoordinate().get(0));
             entity.setYCoordinate(dto.getCoordinate().get(1));
         }
-        if (dto.getRelatedTaskId() != null) entity.setRelatedTaskId(dto.getRelatedTaskId());
+        if (dto.getRelatedTaskIds() != null) entity.setRelatedTaskIds(dto.getRelatedTaskIds());
         if (dto.getCoordinates() != null) entity.setCoordinates(dto.getCoordinates());
         if (dto.getDetails() != null) {
             if (dto.getDetails().getOwner() != null) entity.setOwner(dto.getDetails().getOwner());
