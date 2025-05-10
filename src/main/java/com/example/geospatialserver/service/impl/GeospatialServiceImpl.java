@@ -8,6 +8,8 @@ import com.example.geospatialserver.model.dto.OperatorStatisticDTO;
 import com.example.geospatialserver.model.dto.RelatedTaskDTO;
 import com.example.geospatialserver.model.entity.GeoPointEntity;
 import com.example.geospatialserver.model.entity.WorkStage;
+import com.example.geospatialserver.model.kafka.Type;
+import com.example.geospatialserver.model.kafka.UpdateElementDTO;
 import com.example.geospatialserver.repository.EliminationMethodRepository;
 import com.example.geospatialserver.repository.GeoPointRepository;
 import com.example.geospatialserver.repository.LandTypeRepository;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -40,6 +43,7 @@ public class GeospatialServiceImpl implements GeospatialService {
     private final EliminationMethodRepository eliminationMethodRepository;
     private final ProblemAreaTypeRepository problemAreaTypeRepository;
     private final GeoPointMapper geoPointMapper;
+    private final KafkaService kafkaService;
 
     @Transactional
     @Override
@@ -95,8 +99,16 @@ public class GeospatialServiceImpl implements GeospatialService {
     public MarkerDTO updateGeoPoint(UUID geoPointId, MarkerDTO marker) {
         var geoPointEntity = getGeoPointById(geoPointId);
 
-        geoPointEntity = geoPointMapper.mergeGeoPoint(geoPointEntity, marker);
         var details = marker.getDetails();
+        if (details != null && !Objects.equals(geoPointEntity.getWorkStage().getName(), marker.getDetails().getWorkStage())) {
+            var message = UpdateElementDTO.builder()
+                    .elementId(geoPointId)
+                    .type(Type.POINT.getName())
+                    .status(marker.getDetails().getWorkStage())
+                    .build();
+            kafkaService.produceUpdateElementMessage(message);
+        }
+        geoPointEntity = geoPointMapper.mergeGeoPoint(geoPointEntity, marker);
         if (details != null) {
             if (details.getLandType() != null) {
                 var landType = landTypeRepository.findByName(details.getLandType())
