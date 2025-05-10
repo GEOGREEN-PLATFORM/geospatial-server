@@ -1,8 +1,11 @@
 package com.example.geospatialserver.controller;
 
 import com.example.geospatialserver.exception.ApplicationError;
+import com.example.geospatialserver.model.dto.Density;
 import com.example.geospatialserver.model.dto.ListMarkerResponse;
 import com.example.geospatialserver.model.dto.MarkerDTO;
+import com.example.geospatialserver.model.dto.OperatorStatisticDTO;
+import com.example.geospatialserver.model.dto.RelatedTaskDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -237,6 +240,15 @@ public interface GeospatialController {
                                                        @NotNull @RequestParam("size") int size,
                                                        @RequestParam(value = "workStage", required = false) String workStage,
                                                        @RequestParam(value = "landType", required = false) String landType,
+                                                       @RequestParam(value = "density", required = false) Density density,
+                                                       @RequestParam(value = "eliminationMethod", required = false) String eliminationMethod,
+                                                       @RequestParam(value = "operatorId", required = false) UUID operatorId,
                                                        @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime fromDate,
                                                        @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime toDate);
+
+    @PostMapping(path = "/related-task/{geoPontId}")
+    ResponseEntity<Void> addRelatedTask(@PathVariable("geoPontId") UUID geoPontId, @RequestBody RelatedTaskDTO request);
+
+    @GetMapping(path = "/get-statistic/{operatorId}")
+    ResponseEntity<OperatorStatisticDTO> getStatistic(@PathVariable("operatorId") UUID operatorId);
 }

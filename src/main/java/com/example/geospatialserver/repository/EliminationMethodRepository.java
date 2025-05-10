@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface EliminationMethodRepository extends JpaRepository<EliminationMethodEntity, Integer> {
     Optional<EliminationMethodEntity> findByProblemAreaTypeIdAndName(Integer problemAreaTypeId, String name);
+
+    Optional<EliminationMethodEntity> findByName(String name);
 }

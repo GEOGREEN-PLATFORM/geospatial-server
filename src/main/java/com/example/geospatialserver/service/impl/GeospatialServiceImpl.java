@@ -1,9 +1,15 @@
 package com.example.geospatialserver.service.impl;
 
 import com.example.geospatialserver.mappers.GeoPointMapper;
+import com.example.geospatialserver.model.dto.Density;
 import com.example.geospatialserver.model.dto.ListMarkerResponse;
 import com.example.geospatialserver.model.dto.MarkerDTO;
+import com.example.geospatialserver.model.dto.OperatorStatisticDTO;
+import com.example.geospatialserver.model.dto.RelatedTaskDTO;
 import com.example.geospatialserver.model.entity.GeoPointEntity;
+import com.example.geospatialserver.model.entity.WorkStage;
+import com.example.geospatialserver.model.kafka.Type;
+import com.example.geospatialserver.model.kafka.UpdateElementDTO;
 import com.example.geospatialserver.repository.EliminationMethodRepository;
 import com.example.geospatialserver.repository.GeoPointRepository;
 import com.example.geospatialserver.repository.LandTypeRepository;
@@ -21,7 +27,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static com.example.geospatialserver.util.ExceptionStringUtil.GEO_POINT_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +43,7 @@ public class GeospatialServiceImpl implements GeospatialService {
     private final EliminationMethodRepository eliminationMethodRepository;
     private final ProblemAreaTypeRepository problemAreaTypeRepository;
     private final GeoPointMapper geoPointMapper;
+    private final KafkaService kafkaService;
 
     @Transactional
     @Override
@@ -73,19 +85,30 @@ public class GeospatialServiceImpl implements GeospatialService {
 
     @Override
     public MarkerDTO getGeoPoint(UUID geoPointId) {
-        var geoPointEntity = geoPointRepository.findById(geoPointId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Точка с id {%s} не найдена", geoPointId)));
+        var geoPointEntity = getGeoPointById(geoPointId);
         return geoPointMapper.toDTO(geoPointEntity);
+    }
+
+    private GeoPointEntity getGeoPointById(UUID geoPointId) {
+        return geoPointRepository.findById(geoPointId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(GEO_POINT_NOT_FOUND, geoPointId)));
     }
 
     @Transactional
     @Override
     public MarkerDTO updateGeoPoint(UUID geoPointId, MarkerDTO marker) {
-        var geoPointEntity = geoPointRepository.findById(geoPointId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Точка с id {%s} не найдена", geoPointId)));
+        var geoPointEntity = getGeoPointById(geoPointId);
 
-        geoPointEntity = geoPointMapper.mergeGeoPoint(geoPointEntity, marker);
         var details = marker.getDetails();
+        if (details != null && !Objects.equals(geoPointEntity.getWorkStage().getName(), marker.getDetails().getWorkStage())) {
+            var message = UpdateElementDTO.builder()
+                    .elementId(geoPointId)
+                    .type(Type.POINT.getName())
+                    .status(marker.getDetails().getWorkStage())
+                    .build();
+            kafkaService.produceUpdateElementMessage(message);
+        }
+        geoPointEntity = geoPointMapper.mergeGeoPoint(geoPointEntity, marker);
         if (details != null) {
             if (details.getLandType() != null) {
                 var landType = landTypeRepository.findByName(details.getLandType())
@@ -118,9 +141,7 @@ public class GeospatialServiceImpl implements GeospatialService {
     @Transactional
     @Override
     public void deleteGeoPoint(UUID geoPointId) {
-        if (!geoPointRepository.existsById(geoPointId)) {
-            throw new EntityNotFoundException(String.format("Точка с id {%s} не найдена", geoPointId));
-        }
+        getGeoPointById(geoPointId);
         geoPointRepository.deleteById(geoPointId);
     }
 
@@ -138,6 +159,7 @@ public class GeospatialServiceImpl implements GeospatialService {
     @Override
     public ListMarkerResponse getAllGeoPoints(int page, int size,
                                               String workStage, String landType,
+                                              Density density, String eliminationMethod, UUID operatorId,
                                               OffsetDateTime startDate, OffsetDateTime endDate) {
         Pageable pageable = PageRequest.of(page, size);
         Specification<GeoPointEntity> spec = Specification.where(null);
@@ -153,6 +175,21 @@ public class GeospatialServiceImpl implements GeospatialService {
             );
         }
 
+        if (density != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("density"), density));
+        }
+
+        if (eliminationMethod != null) {
+            var eliminationMethodEntity = eliminationMethodRepository.findByName(eliminationMethod)
+                    .orElseThrow(() -> new EntityNotFoundException("Неразрешённый способ обработки"));
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(
+                            root.join("eliminationMethod").get("id"),
+                            eliminationMethodEntity.getId()
+                    )
+            );
+        }
+
         if (landType != null) {
             var landTypeEntity = landTypeRepository.findByName(landType)
                     .orElseThrow(() -> new EntityNotFoundException("Неразрешённый тип земли"));
@@ -162,6 +199,10 @@ public class GeospatialServiceImpl implements GeospatialService {
                             landTypeEntity.getId()
                     )
             );
+        }
+
+        if (operatorId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("operatorId"), operatorId));
         }
 
         if (startDate != null) {
@@ -179,5 +220,23 @@ public class GeospatialServiceImpl implements GeospatialService {
         response.setTotalItems(geoPointsPage.getTotalElements());
         response.setTotalPages(geoPointsPage.getTotalPages());
         return response;
+    }
+
+    @Override
+    public void addRelatedTask(UUID geoPointId, RelatedTaskDTO request) {
+        var geoPointEntity = getGeoPointById(geoPointId);
+        geoPointEntity.getRelatedTaskIds().add(request.getRelatedTaskId());
+        geoPointRepository.save(geoPointEntity);
+    }
+
+    @Override
+    public OperatorStatisticDTO getStatistic(UUID operatorId) {
+        Map<String, Long> points = geoPointRepository.findByOperatorId(operatorId).stream()
+                .collect(Collectors.groupingBy(geoPoint -> geoPoint.getWorkStage().getName(), Collectors.counting()));
+        return OperatorStatisticDTO.builder()
+                .createdGeoPoints(points.get(WorkStage.CREATED.getStatus()))
+                .processedGeoPoints(points.get(WorkStage.PROCESSED.getStatus()))
+                .closedGeoPoints(points.get(WorkStage.CLOSED.getStatus()))
+                .build();
     }
 }

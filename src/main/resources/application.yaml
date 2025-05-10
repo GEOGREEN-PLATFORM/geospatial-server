@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 spring:
   application:
@@ -28,6 +28,10 @@ spring:
         jwt:
           issuer-uri: ${KEYCLOAK_URL:http://217.198.13.249:30096}/realms/geogreen
           jwk-set-uri: ${KEYCLOAK_URL:http://217.198.13.249:30096}/realms/geogreen/protocol/openid-connect/certs
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:http://localhost:29092}
+    topic:
+      update-element: update-element
 
 logging:
   level:

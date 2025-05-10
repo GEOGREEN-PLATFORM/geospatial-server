@@ -24,7 +24,7 @@ public class MarkerDTO {
     @Valid
     private DetailsDTO details;
 
-    private UUID relatedTaskId;
+    private List<UUID> relatedTaskIds;
 
     private List<List<Double>> coordinates;
 }

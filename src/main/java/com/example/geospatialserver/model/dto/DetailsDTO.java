@@ -2,12 +2,14 @@ package com.example.geospatialserver.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static com.example.geospatialserver.util.DateUtil.ISO_8601_DATE_TIME_MILLIS_PATTERN;
 import static com.example.geospatialserver.util.DateUtil.UTC;
@@ -31,6 +33,7 @@ public class DetailsDTO {
 
     private String eliminationMethod;
 
+    @Size(max = 10, message = "Количество изображений не может быть больше 10")
     private List<ImageUrlDTO> images;
 
     private String problemAreaType;
@@ -52,4 +55,6 @@ public class DetailsDTO {
             timezone = UTC
     )
     private OffsetDateTime updateDate;
+
+    private UUID operatorId;
 }

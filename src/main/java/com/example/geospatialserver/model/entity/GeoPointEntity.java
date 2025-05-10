@@ -23,6 +23,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,8 +77,9 @@ public class GeoPointEntity {
     @Column(name = "comment", nullable = false)
     private String comment;
 
-    @Column(name = "related_task_id", nullable = false)
-    private UUID relatedTaskId;
+    @Column(name = "related_task_ids", columnDefinition = "jsonb", nullable = false)
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<UUID> relatedTaskIds;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "coordinates", nullable = false)
@@ -93,11 +95,15 @@ public class GeoPointEntity {
     @Column(name = "update_date", nullable = false)
     private OffsetDateTime updateDate;
 
+    @Column(name = "operator_id")
+    private UUID operatorId;
+
     @PrePersist
     protected void onCreate() {
         OffsetDateTime now = OffsetDateTime.now();
         creationDate = now;
         updateDate = now;
+        if (relatedTaskIds == null) relatedTaskIds = new ArrayList<>();
     }
 
     @PreUpdate
