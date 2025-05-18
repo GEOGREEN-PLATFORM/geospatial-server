@@ -27,7 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<geospatial-server.version>0.2.2</geospatial-server.version>
+		<geospatial-server.version>0.2.3</geospatial-server.version>
 		<java.version>21</java.version>
 		<flywaydb.version>9.22.1</flywaydb.version>
 		<lombok.version>1.18.30</lombok.version>
@@ -102,6 +102,14 @@
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
 	</dependencies>
 
