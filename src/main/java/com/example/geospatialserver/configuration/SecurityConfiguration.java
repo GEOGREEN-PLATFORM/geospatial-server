@@ -12,6 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfiguration {
     private static final String[] ALLOWED_URLS = {"/v3/api-docs/**",
             "/swagger-ui/**",
+            "/actuator/**",
             "/geo/dict/**",
             "/geo/info/{geoPointId}",
             "/geo/info/getAll",
