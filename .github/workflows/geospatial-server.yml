@@ -34,7 +34,7 @@ jobs:
           echo "::set-output name=version::$VERSION"
 
       - name: maven build
-        run: mvn -am package
+        run: mvn clean verify -B
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
