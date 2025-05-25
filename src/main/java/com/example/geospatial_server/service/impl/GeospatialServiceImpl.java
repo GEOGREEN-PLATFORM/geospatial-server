@@ -1,0 +1,243 @@
+package com.example.geospatial_server.service.impl;
+
+import com.example.geospatial_server.mappers.GeoPointMapper;
+import com.example.geospatial_server.model.dto.Density;
+import com.example.geospatial_server.model.dto.ListMarkerResponse;
+import com.example.geospatial_server.model.dto.MarkerDTO;
+import com.example.geospatial_server.model.dto.OperatorStatisticDTO;
+import com.example.geospatial_server.model.dto.RelatedTaskDTO;
+import com.example.geospatial_server.model.entity.GeoPointEntity;
+import com.example.geospatial_server.model.entity.WorkStage;
+import com.example.geospatial_server.model.kafka.Type;
+import com.example.geospatial_server.model.kafka.UpdateElementDTO;
+import com.example.geospatial_server.repository.EliminationMethodRepository;
+import com.example.geospatial_server.repository.GeoPointRepository;
+import com.example.geospatial_server.repository.LandTypeRepository;
+import com.example.geospatial_server.repository.ProblemAreaTypeRepository;
+import com.example.geospatial_server.repository.WorkStageRepository;
+import com.example.geospatial_server.service.GeospatialService;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static com.example.geospatial_server.util.ExceptionStringUtil.GEO_POINT_NOT_FOUND;
+
+@Service
+@RequiredArgsConstructor
+public class GeospatialServiceImpl implements GeospatialService {
+    private final GeoPointRepository geoPointRepository;
+    private final LandTypeRepository landTypeRepository;
+    private final WorkStageRepository workStageRepository;
+    private final EliminationMethodRepository eliminationMethodRepository;
+    private final ProblemAreaTypeRepository problemAreaTypeRepository;
+    private final GeoPointMapper geoPointMapper;
+    private final KafkaService kafkaService;
+
+    @Transactional
+    @Override
+    public MarkerDTO createGeoPoint(MarkerDTO marker) {
+        var landType = marker.getDetails().getLandType() == null ? null :
+                landTypeRepository.findByName(marker.getDetails().getLandType())
+                        .orElseThrow(() -> new EntityNotFoundException("Неразрешённый тип земли"));
+        var workStage = workStageRepository.findByName(marker.getDetails().getWorkStage())
+                .orElseThrow(() -> new EntityNotFoundException("Неразрешённый статус задачи"));
+        var problemAreaType = problemAreaTypeRepository.findByName(marker.getDetails().getProblemAreaType())
+                .orElseThrow(() -> new EntityNotFoundException("Неразрешённый тип проблемы"));
+        var eliminationMethod = marker.getDetails().getEliminationMethod() == null ? null :
+                eliminationMethodRepository
+                        .findByProblemAreaTypeIdAndName(problemAreaType.getId(), marker.getDetails().getEliminationMethod())
+                        .orElseThrow(() -> new EntityNotFoundException("Неразрешённый способ обработки"));
+        var geoPointEntity = geoPointMapper.toEntity(marker);
+        geoPointEntity.setLandType(landType);
+        geoPointEntity.setWorkStage(workStage);
+        geoPointEntity.setEliminationMethod(eliminationMethod);
+        geoPointEntity.setProblemAreaType(problemAreaType);
+        if (marker.getCoordinates() != null) {
+            geoPointEntity.setSquare(calculateSquare(marker.getCoordinates()));
+        }
+        return geoPointMapper.toDTO(geoPointRepository.save(geoPointEntity));
+    }
+
+    private double calculateSquare(List<List<Double>> coordinates) {
+        int n = coordinates.size();
+        if (n < 3) {
+            throw new IllegalArgumentException("coordinates должены иметь как минимум 3 точки");
+        }
+        double area = 0;
+        for (int i = 0; i < n; i++) {
+            int j = (i + 1) % n;
+            area += (coordinates.get(i).get(0) * coordinates.get(j).get(1)) - (coordinates.get(j).get(0) * coordinates.get(i).get(1));
+        }
+        return Math.round(Math.abs(area) / 2.0 * 100.0) / 100.0;
+    }
+
+    @Override
+    public MarkerDTO getGeoPoint(UUID geoPointId) {
+        var geoPointEntity = getGeoPointById(geoPointId);
+        return geoPointMapper.toDTO(geoPointEntity);
+    }
+
+    private GeoPointEntity getGeoPointById(UUID geoPointId) {
+        return geoPointRepository.findById(geoPointId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(GEO_POINT_NOT_FOUND, geoPointId)));
+    }
+
+    @Transactional
+    @Override
+    public MarkerDTO updateGeoPoint(UUID geoPointId, MarkerDTO marker) {
+        var geoPointEntity = getGeoPointById(geoPointId);
+
+        var details = marker.getDetails();
+        if (details != null && !Objects.equals(geoPointEntity.getWorkStage().getName(), marker.getDetails().getWorkStage())) {
+            var message = UpdateElementDTO.builder()
+                    .elementId(geoPointId)
+                    .type(Type.POINT.getName())
+                    .status(marker.getDetails().getWorkStage())
+                    .build();
+            kafkaService.produceUpdateElementMessage(message);
+        }
+        geoPointEntity = geoPointMapper.mergeGeoPoint(geoPointEntity, marker);
+        if (details != null) {
+            if (details.getLandType() != null) {
+                var landType = landTypeRepository.findByName(details.getLandType())
+                        .orElseThrow(() -> new EntityNotFoundException("Неразрешённый тип земли"));
+                geoPointEntity.setLandType(landType);
+            }
+            if (details.getWorkStage() != null) {
+                var workStage = workStageRepository.findByName(details.getWorkStage())
+                        .orElseThrow(() -> new EntityNotFoundException("Неразрешённый статус задачи"));
+                geoPointEntity.setWorkStage(workStage);
+            }
+            if (details.getProblemAreaType() != null) {
+                var problemAreaType = problemAreaTypeRepository.findByName(details.getProblemAreaType())
+                        .orElseThrow(() -> new EntityNotFoundException("Неразрешённый тип проблемы"));
+                geoPointEntity.setProblemAreaType(problemAreaType);
+            }
+            if (details.getEliminationMethod() != null) {
+                var eliminationMethod = eliminationMethodRepository
+                        .findByProblemAreaTypeIdAndName(geoPointEntity.getProblemAreaType().getId(), details.getEliminationMethod())
+                        .orElseThrow(() -> new EntityNotFoundException("Неразрешённый способ обработки"));
+                geoPointEntity.setEliminationMethod(eliminationMethod);
+            }
+        }
+        if (marker.getCoordinates() != null) {
+            geoPointEntity.setSquare(calculateSquare(marker.getCoordinates()));
+        }
+        return geoPointMapper.toDTO(geoPointRepository.saveAndFlush(geoPointEntity));
+    }
+
+    @Transactional
+    @Override
+    public void deleteGeoPoint(UUID geoPointId) {
+        getGeoPointById(geoPointId);
+        geoPointRepository.deleteById(geoPointId);
+    }
+
+    @Override
+    public List<MarkerDTO> getAllGeoPoints(String problemAreaType) {
+        if (problemAreaType == null) {
+            return geoPointRepository.findAll().stream().map(geoPointMapper::toDTO).toList();
+        }
+        var problemAreaTypeEntity = problemAreaTypeRepository.findByName(problemAreaType)
+                .orElseThrow(() -> new EntityNotFoundException("Неразрешённый тип проблемы"));
+        return geoPointRepository.findByProblemAreaTypeId(problemAreaTypeEntity.getId())
+                .stream().map(geoPointMapper::toDTO).toList();
+    }
+
+    @Override
+    public ListMarkerResponse getAllGeoPoints(int page, int size,
+                                              String workStage, String landType,
+                                              Density density, String eliminationMethod, UUID operatorId,
+                                              OffsetDateTime startDate, OffsetDateTime endDate) {
+        Pageable pageable = PageRequest.of(page, size);
+        Specification<GeoPointEntity> spec = Specification.where(null);
+
+        if (workStage != null) {
+            var workStageEntity = workStageRepository.findByName(workStage)
+                    .orElseThrow(() -> new EntityNotFoundException("Неразрешённый статус задачи"));
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(
+                            root.join("workStage").get("id"),
+                            workStageEntity.getId()
+                    )
+            );
+        }
+
+        if (density != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("density"), density));
+        }
+
+        if (eliminationMethod != null) {
+            var eliminationMethodEntity = eliminationMethodRepository.findByName(eliminationMethod)
+                    .orElseThrow(() -> new EntityNotFoundException("Неразрешённый способ обработки"));
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(
+                            root.join("eliminationMethod").get("id"),
+                            eliminationMethodEntity.getId()
+                    )
+            );
+        }
+
+        if (landType != null) {
+            var landTypeEntity = landTypeRepository.findByName(landType)
+                    .orElseThrow(() -> new EntityNotFoundException("Неразрешённый тип земли"));
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(
+                            root.join("landType").get("id"),
+                            landTypeEntity.getId()
+                    )
+            );
+        }
+
+        if (operatorId != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("operatorId"), operatorId));
+        }
+
+        if (startDate != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("creationDate"), startDate));
+        }
+
+        if (endDate != null) {
+            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("creationDate"), endDate));
+        }
+
+        Page<GeoPointEntity> geoPointsPage = geoPointRepository.findAll(spec, pageable);
+        ListMarkerResponse response = new ListMarkerResponse();
+        response.setGeoPoints(geoPointsPage.getContent().stream().map(geoPointMapper::toDTO).toList());
+        response.setCurrentPage(geoPointsPage.getNumber());
+        response.setTotalItems(geoPointsPage.getTotalElements());
+        response.setTotalPages(geoPointsPage.getTotalPages());
+        return response;
+    }
+
+    @Override
+    public void addRelatedTask(UUID geoPointId, RelatedTaskDTO request) {
+        var geoPointEntity = getGeoPointById(geoPointId);
+        geoPointEntity.getRelatedTaskIds().add(request.getRelatedTaskId());
+        geoPointRepository.save(geoPointEntity);
+    }
+
+    @Override
+    public OperatorStatisticDTO getStatistic(UUID operatorId) {
+        Map<String, Long> points = geoPointRepository.findByOperatorId(operatorId).stream()
+                .collect(Collectors.groupingBy(geoPoint -> geoPoint.getWorkStage().getName(), Collectors.counting()));
+        System.out.println(points);
+        return OperatorStatisticDTO.builder()
+                .createdGeoPoints(points.get(WorkStage.CREATED.getStatus()))
+                .processedGeoPoints(points.get(WorkStage.PROCESSED.getStatus()))
+                .closedGeoPoints(points.get(WorkStage.CLOSED.getStatus()))
+                .build();
+    }
+}
