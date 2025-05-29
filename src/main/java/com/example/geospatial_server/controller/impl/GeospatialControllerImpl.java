@@ -67,12 +67,13 @@ public class GeospatialControllerImpl implements GeospatialController {
                                                               @NotNull @RequestParam("size") int size,
                                                               @RequestParam(value = "workStage", required = false) String workStage,
                                                               @RequestParam(value = "landType", required = false) String landType,
+                                                              @RequestParam(value = "problemAreaType", required = false) String problemAreaType,
                                                               @RequestParam(value = "density", required = false) Density density,
                                                               @RequestParam(value = "eliminationMethod", required = false) String eliminationMethod,
                                                               @RequestParam(value = "operatorId", required = false) UUID operatorId,
                                                               @RequestParam(value = "fromDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime fromDate,
                                                               @RequestParam(value = "toDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime toDate) {
-        return ResponseEntity.ok(geospatialService.getAllGeoPoints(page, size, workStage, landType, density, eliminationMethod, operatorId, fromDate, toDate));
+        return ResponseEntity.ok(geospatialService.getAllGeoPoints(page, size, workStage, landType, problemAreaType, density, eliminationMethod, operatorId, fromDate, toDate));
     }
 
 

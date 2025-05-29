@@ -240,6 +240,7 @@ public interface GeospatialController {
                                                        @NotNull @RequestParam("size") int size,
                                                        @RequestParam(value = "workStage", required = false) String workStage,
                                                        @RequestParam(value = "landType", required = false) String landType,
+                                                       @RequestParam(value = "problemAreaType", required = false) String problemAreaType,
                                                        @RequestParam(value = "density", required = false) Density density,
                                                        @RequestParam(value = "eliminationMethod", required = false) String eliminationMethod,
                                                        @RequestParam(value = "operatorId", required = false) UUID operatorId,
@@ -249,6 +250,9 @@ public interface GeospatialController {
     @PostMapping(path = "/related-task/{geoPontId}")
     ResponseEntity<Void> addRelatedTask(@PathVariable("geoPontId") UUID geoPontId, @RequestBody RelatedTaskDTO request);
 
+    @Operation(
+            summary = "Получение статистики оператора, очаги в статусах - создано, в работе и завершено"
+    )
     @GetMapping(path = "/get-statistic/{operatorId}")
     ResponseEntity<OperatorStatisticDTO> getStatistic(@PathVariable("operatorId") UUID operatorId);
 }

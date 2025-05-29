@@ -110,6 +110,7 @@ class GeospatialControllerImplTest {
         String landType = "Forest";
         Density density = Density.HIGH;
         String elimMethod = "Burn";
+        String problemAreaType = "fire";
         UUID operatorId = UUID.randomUUID();
         OffsetDateTime from = OffsetDateTime.now().minusDays(1);
         OffsetDateTime to = OffsetDateTime.now();
@@ -121,16 +122,16 @@ class GeospatialControllerImplTest {
         respDto.setTotalPages(2);
 
         when(geospatialService.getAllGeoPoints(
-                page, size, workStage, landType, density, elimMethod, operatorId, from, to))
+                page, size, workStage, landType, problemAreaType, density, elimMethod, operatorId, from, to))
                 .thenReturn(respDto);
 
         ResponseEntity<ListMarkerResponse> resp = controller.getAllGeoPoints(
-                page, size, workStage, landType, density, elimMethod, operatorId, from, to);
+                page, size, workStage, landType, problemAreaType, density, elimMethod, operatorId, from, to);
 
         assertEquals(HttpStatus.OK, resp.getStatusCode());
         assertSame(respDto, resp.getBody());
         verify(geospatialService).getAllGeoPoints(
-                page, size, workStage, landType, density, elimMethod, operatorId, from, to);
+                page, size, workStage, landType, problemAreaType, density, elimMethod, operatorId, from, to);
     }
 
     @Test

@@ -22,7 +22,7 @@ public interface GeospatialService {
     List<MarkerDTO> getAllGeoPoints(String problemAreaType);
 
     ListMarkerResponse getAllGeoPoints(int page, int size,
-                                       String workStage, String landType,
+                                       String workStage, String landType, String problemAreaType,
                                        Density density, String eliminationMethod, UUID operatorId,
                                        OffsetDateTime startDate, OffsetDateTime endDate);
 

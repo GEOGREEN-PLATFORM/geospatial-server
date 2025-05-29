@@ -27,7 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<geospatial-server.version>0.2.4</geospatial-server.version>
+		<geospatial-server.version>1.0.0</geospatial-server.version>
 		<java.version>21</java.version>
 		<flywaydb.version>9.22.1</flywaydb.version>
 		<lombok.version>1.18.30</lombok.version>
@@ -45,6 +45,11 @@
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
 			<version>${flywaydb.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

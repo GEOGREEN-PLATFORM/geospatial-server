@@ -158,7 +158,7 @@ public class GeospatialServiceImpl implements GeospatialService {
 
     @Override
     public ListMarkerResponse getAllGeoPoints(int page, int size,
-                                              String workStage, String landType,
+                                              String workStage, String landType, String problemAreaType,
                                               Density density, String eliminationMethod, UUID operatorId,
                                               OffsetDateTime startDate, OffsetDateTime endDate) {
         Pageable pageable = PageRequest.of(page, size);
@@ -171,6 +171,17 @@ public class GeospatialServiceImpl implements GeospatialService {
                     cb.equal(
                             root.join("workStage").get("id"),
                             workStageEntity.getId()
+                    )
+            );
+        }
+
+        if (problemAreaType != null) {
+            var problemAreaTypeEntity = problemAreaTypeRepository.findByName(problemAreaType)
+                    .orElseThrow(() -> new EntityNotFoundException("Неразрешённый тип проблемы"));
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(
+                            root.join("problemAreaType").get("id"),
+                            problemAreaTypeEntity.getId()
                     )
             );
         }

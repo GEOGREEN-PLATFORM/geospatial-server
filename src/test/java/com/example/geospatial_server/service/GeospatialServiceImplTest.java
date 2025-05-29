@@ -293,7 +293,7 @@ class GeospatialServiceImplTest {
         when(geoPointMapper.toDTO(geoPointEntity)).thenReturn(markerDto);
 
         ListMarkerResponse resp = geospatialService.getAllGeoPoints(
-                0, 1, null, null, null, null, null, null, null
+                0, 1, null, null, null, null, null, null, null, null
         );
 
         assertEquals(0, resp.getCurrentPage());
@@ -304,6 +304,11 @@ class GeospatialServiceImplTest {
 
     @Test
     void addRelatedTask_AppendsIdAndSaves() {
+        //Given
+        geoPointEntity = new GeoPointEntity();
+        geoPointEntity.setXCoordinate(1.0);
+        geoPointEntity.setYCoordinate(2.0);
+        geoPointEntity.setRelatedTaskIds(new ArrayList<>());
         UUID id = UUID.randomUUID();
         RelatedTaskDTO req = new RelatedTaskDTO();
         UUID taskId = UUID.randomUUID();
@@ -311,8 +316,10 @@ class GeospatialServiceImplTest {
 
         when(geoPointRepository.findById(id)).thenReturn(Optional.of(geoPointEntity));
 
+        //when
         geospatialService.addRelatedTask(id, req);
 
+        //then
         assertTrue(geoPointEntity.getRelatedTaskIds().contains(taskId));
         verify(geoPointRepository).save(geoPointEntity);
     }
